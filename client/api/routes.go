@@ -15,6 +15,9 @@ func StartRest(port string) {
 	router := gin.Default()
 	router.POST("/ticket", CreateTicket)
 	router.GET("/ticket/:id", ViewTicket)
+	router.PUT("/ticket", UpdateTicket)
+	router.GET("/tickets/:section", ViewAllReservations)
+	router.DELETE("/ticket/:id", DeleteTicket)
 	router.Run(fmt.Sprintf("localhost:%s", port))
 }
 func StartClient() {
