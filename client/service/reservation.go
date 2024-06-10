@@ -4,10 +4,13 @@ import (
 	"context"
 	"strings"
 
+	"github.com/reservation/constants"
 	"github.com/reservation/protos"
 	"github.com/reservation/resources"
 	"github.com/reservation/utils"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ReservationInterface interface {
@@ -43,12 +46,15 @@ func (r *reservation) CreateTicket(ctx context.Context, user resources.User) (*r
 }
 
 func (r *reservation) ViewTicket(ctx context.Context, userId string) (*resources.Reservation, error) {
-	r.logger.Info("enter Create ticket client")
+	r.logger.Info("enter ViewTicket  client")
 	protoUserId := &protos.UserId{UserId: userId}
 	res, err := r.reservationServer.ViewTicket(ctx, protoUserId)
 	if err != nil {
-		return nil, err
+		if status.Code(err) == codes.NotFound {
+			return nil, constants.ErrNotFound
+		}
 	}
+
 	return utils.ReservationModelMapper(res), nil
 }
 
@@ -71,7 +77,9 @@ func (r *reservation) DeleteTicket(ctx context.Context, userId string) (string, 
 	protoUserId := &protos.UserId{UserId: userId}
 	res, err := r.reservationServer.DeleteTicket(ctx, protoUserId)
 	if err != nil {
-		return "", err
+		if status.Code(err) == codes.NotFound {
+			return "nil", constants.ErrNotFound
+		}
 	}
 	return res.MessageResponse, nil
 }
@@ -86,7 +94,9 @@ func (r *reservation) UpdateTicket(ctx context.Context, user resources.User) (*r
 	}
 	res, err := r.reservationServer.UpdateTicket(ctx, protoUser)
 	if err != nil {
-		return nil, err
+		if status.Code(err) == codes.NotFound {
+			return nil, constants.ErrNotFound
+		}
 	}
 	return utils.ReservationModelMapper(res), nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/reservation/client/service"
+	"github.com/reservation/constants"
 	"github.com/reservation/resources"
 	"github.com/sirupsen/logrus"
 )
@@ -23,6 +24,7 @@ func CreateTicket(c *gin.Context) {
 	res, err := reservationClient.CreateTicket(c.Request.Context(), user)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusCreated, res)
 }
@@ -32,8 +34,13 @@ func ViewTicket(c *gin.Context) {
 	logger.Info("enter  " + funcDesc)
 	UserId := c.Param("id")
 	res, err := reservationClient.ViewTicket(c.Request.Context(), UserId)
+	if err.Error() == constants.ErrNotFound.Error() {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, res)
 }
@@ -43,8 +50,13 @@ func DeleteTicket(c *gin.Context) {
 	logger.Info("enter  " + funcDesc)
 	UserId := c.Param("id")
 	res, err := reservationClient.DeleteTicket(c.Request.Context(), UserId)
+	if err == constants.ErrNotFound {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusAccepted, res)
 }
@@ -56,6 +68,7 @@ func ViewAllReservations(c *gin.Context) {
 	res, err := reservationClient.ViewReservations(c.Request.Context(), section)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusOK, res)
 }
@@ -69,8 +82,13 @@ func UpdateTicket(c *gin.Context) {
 		return
 	}
 	res, err := reservationClient.UpdateTicket(c.Request.Context(), user)
+	if err == constants.ErrNotFound {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusAccepted, res)
 }

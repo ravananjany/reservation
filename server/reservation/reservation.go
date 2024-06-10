@@ -8,6 +8,8 @@ import (
 	"github.com/reservation/constants"
 	"github.com/reservation/protos"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ReservationService struct {
@@ -32,6 +34,8 @@ func (r *ReservationService) CreateTicket(ctx context.Context, user *protos.User
 	r.logger.Info("enter CreateTicket server")
 
 	r.mutex.Lock()
+	defer r.mutex.Unlock()
+
 	userId := uuid.New().String()
 	user.UserId = userId
 	booking := protos.BookingDetails{}
@@ -56,7 +60,6 @@ func (r *ReservationService) CreateTicket(ctx context.Context, user *protos.User
 	}
 	r.reservationMap[user.UserId] = reservation
 
-	r.mutex.Unlock()
 	return reservation, nil
 }
 
@@ -65,6 +68,7 @@ func (r *ReservationService) ViewTicket(ctx context.Context, id *protos.UserId) 
 	var res *protos.Reservation
 	var found bool
 	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
 	for k, V := range r.reservationMap {
 		if k == id.UserId {
@@ -77,9 +81,8 @@ func (r *ReservationService) ViewTicket(ctx context.Context, id *protos.UserId) 
 	if found {
 		return res, nil
 	}
-	r.mutex.Unlock()
-
-	return nil, constants.ErrNotFound
+	r.logger.Info("exit")
+	return nil, status.Error(codes.NotFound, constants.ErrNotFound.Error())
 }
 
 func (r *ReservationService) Viewreservations(ctx context.Context, all *protos.ReadAll) (*protos.Reservations, error) {
@@ -112,6 +115,7 @@ func (r *ReservationService) DeleteTicket(ctx context.Context, userId *protos.Us
 	r.logger.Info("enter DeleteTicket server")
 
 	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	var found bool
 	for K := range r.reservationMap {
 		if userId.UserId == K {
@@ -120,12 +124,9 @@ func (r *ReservationService) DeleteTicket(ctx context.Context, userId *protos.Us
 		}
 	}
 	if !found {
-		return nil, constants.ErrNotFound
+		return nil, status.Error(codes.NotFound, constants.ErrNotFound.Error())
 	}
-
 	delete(r.reservationMap, userId.UserId)
-
-	r.mutex.Unlock()
 
 	return &protos.DeleteResponse{MessageResponse: constants.DELETERES}, nil
 }
@@ -134,14 +135,15 @@ func (r *ReservationService) UpdateTicket(ctx context.Context, user *protos.User
 	r.logger.Info("enter UpdateTicket server")
 
 	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	currentUserResDetails := GetUserDetails(r.reservationMap, user.UserId)
 	if currentUserResDetails == nil {
-		return nil, constants.ErrNotFound
+		return nil, status.Error(codes.NotFound, constants.ErrNotFound.Error())
 	}
 	delete(r.reservationMap, currentUserResDetails.User.UserId)
 	currentUserResDetails.User = user
 	r.reservationMap[user.UserId] = currentUserResDetails
-	r.mutex.Unlock()
+
 	return currentUserResDetails, nil
 }
 
