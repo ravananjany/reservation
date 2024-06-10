@@ -1,0 +1,4 @@
+Logfile : ""
+Loglevel : "info"
+Apiport : "8080"
+Grpcport : "50001"

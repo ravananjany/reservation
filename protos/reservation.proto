@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package protos;
+
+option go_package = "github.com/jany/protos";
+
+message User{
+       string user_id = 1;
+       string first_name = 2;
+       string last_name = 3;
+       string email_id = 4;
+}
+
+message BookingDetails{
+        string section = 1;
+        int32 seat = 2; 
+}
+
+message ReadAll{
+        string section = 1;
+}
+
+message ReservationId{
+     string reservation_id = 1;
+}
+
+message UserId{
+    string user_id = 1;
+}
+
+message Reservation{
+        string reservation_id = 1;
+        User user = 2;
+        BookingDetails booking = 3;
+}
+
+message  Reservations{
+        repeated Reservation reservation = 1;
+}
+
+message DeleteResponse {
+        string messageResponse = 1;
+}
+
+service ReservationService {
+        rpc CreateTicket(User) returns (Reservation);
+        rpc ViewTicket(UserId) returns (Reservation);
+        rpc Viewreservations(ReadAll) returns (Reservations);
+        rpc DeleteTicket(UserId) returns (DeleteResponse);
+        rpc UpdateTicket(User) returns (Reservation);
+
+}
+
