@@ -9,6 +9,7 @@ import (
 )
 
 func ReservationModelMapper(res *protos.Reservation) *resources.Reservation {
+
 	reservation := &resources.Reservation{
 		UserId: res.User.UserId,
 		From:   constants.BOARD,

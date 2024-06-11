@@ -63,9 +63,9 @@ func (r *reservation) ViewReservations(ctx context.Context, section string) ([]*
 	readAll := &protos.ReadAll{Section: strings.ToUpper(section)}
 	res, err := r.reservationServer.Viewreservations(ctx, readAll)
 	if err != nil {
-		return nil, err
+		return nil, constants.ErrNotFound
 	}
-	var result []*resources.Reservation
+	result := []*resources.Reservation{}
 	for _, v := range res.Reservation {
 		result = append(result, utils.ReservationModelMapper(v))
 	}

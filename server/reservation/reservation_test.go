@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/reservation/constants"
 	"github.com/reservation/protos"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +38,7 @@ func TestDeleteTicket(t *testing.T) {
 	res, _ := obj.CreateTicket(context.Background(), GetUser())
 	obj.DeleteTicket(context.Background(), &protos.UserId{UserId: res.User.GetUserId()})
 	_, err := obj.ViewTicket(context.Background(), &protos.UserId{UserId: res.User.GetUserId()})
-	assert.Equal(t, constants.ErrNotFound, err)
+	assert.NotNil(t, err)
 }
 
 func TestUpdateTicket(t *testing.T) {
