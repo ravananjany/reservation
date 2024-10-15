@@ -11,7 +11,7 @@ curl --location --request GET 'http://localhost:8080/tickets/a' \
    "last_name":"jany2113",
    "email_id":"abc21@gmail.com"
 }'
-
+#red color updated
 
 # get receipt details 
 curl --location --request GET 'http://localhost:8080/ticket/24099ed7-1be1-45d4-ab2e-81413b2c7f9f' \
