@@ -2,6 +2,7 @@
 #protoc --go_out=. --go_opt=paths=source_relative     --go-grpc_out=. --go-grpc_opt=paths=source_relative     protos/reservation.proto
 
 #get all resources
+#blue color updated in 
 # get user and seat deatils based on requested section
 curl --location --request GET 'http://localhost:8080/tickets/a' \
 --header 'Content-Type: application/json' \
@@ -11,7 +12,7 @@ curl --location --request GET 'http://localhost:8080/tickets/a' \
    "last_name":"jany2113",
    "email_id":"abc21@gmail.com"
 }'
-
+#red color updated
 
 # get receipt details 
 curl --location --request GET 'http://localhost:8080/ticket/24099ed7-1be1-45d4-ab2e-81413b2c7f9f' \
