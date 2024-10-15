@@ -1,10 +1,11 @@
 package resources
 
 type User struct {
-	UserId    string `json:"user_id"`
-	FirstName string `json:"first_name,omitempty"`
-	LastName  string `json:"last_name,omitempty"`
-	EmailId   string `json:"email_id,omitempty"`
+	UserId       string `json:"user_id"`
+	FirstName    string `json:"first_name,omitempty"`
+	LastName     string `json:"last_name,omitempty"`
+	EmailId      string `json:"email_id,omitempty"`
+	DiscountCode string `json:"discount_code,omitempty"`
 }
 
 type Reservation struct {

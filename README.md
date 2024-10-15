@@ -1,5 +1,5 @@
 # reservation
-#protoc --go_out=. --go_opt=paths=source_relative     --go-grpc_out=. --go-grpc_opt=paths=source_relative     protos/blog/blog.proto
+#protoc --go_out=. --go_opt=paths=source_relative     --go-grpc_out=. --go-grpc_opt=paths=source_relative     protos/reservation.proto
 
 
 # get user and seat deatils based on requested section
@@ -56,3 +56,9 @@ curl --location --request PUT 'http://localhost:8080/ticket' \
 
 # unit tests coverage for client is above 90 percent
 # unit tests coverage for server is above 80 percent
+
+
+//discount
+//rev discountcode30
+//price 20
+//discount upto 20 dollar

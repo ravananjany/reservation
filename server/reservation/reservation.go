@@ -2,6 +2,8 @@ package reservation
 
 import (
 	"context"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/google/uuid"
@@ -15,7 +17,6 @@ import (
 type ReservationService struct {
 	protos.ReservationServiceServer
 	reservationMap map[string]*protos.Reservation
-	bookingMap     map[string]int //map that holds the seat number
 	sectionA       int
 	sectionB       int
 	mutex          sync.Mutex
@@ -25,7 +26,6 @@ type ReservationService struct {
 func NewReservationService(log *logrus.Logger) *ReservationService {
 	return &ReservationService{
 		reservationMap: make(map[string]*protos.Reservation),
-		bookingMap:     make(map[string]int),
 		logger:         log,
 	}
 }
@@ -40,10 +40,6 @@ func (r *ReservationService) CreateTicket(ctx context.Context, user *protos.User
 	user.UserId = userId
 	booking := protos.BookingDetails{}
 
-	if r.sectionA+r.sectionB >= constants.SEAT_LIMIT {
-		return nil, constants.ErrReservationFull
-	}
-
 	if r.sectionA < r.sectionB {
 		r.sectionA++
 		booking.Section = constants.SEC_A
@@ -54,6 +50,13 @@ func (r *ReservationService) CreateTicket(ctx context.Context, user *protos.User
 		booking.Seat = int32(r.sectionB + 1)
 	}
 
+	dp, err := r.CheckPriceDiscount(user.DiscountCode)
+	if err != nil {
+		return nil, err
+	}
+
+	booking.DiscountPrice = dp
+
 	reservation := &protos.Reservation{
 		Booking: &booking,
 		User:    user,
@@ -61,6 +64,35 @@ func (r *ReservationService) CreateTicket(ctx context.Context, user *protos.User
 	r.reservationMap[user.UserId] = reservation
 
 	return reservation, nil
+}
+
+func (r *ReservationService) CheckPriceDiscount(dis string) (int32, error) {
+	if len(dis) == 0 {
+		return 20, nil
+	}
+
+	//discount30
+	//dthirty
+
+	var sb strings.Builder
+	for i, v := range dis {
+		if i != 0 {
+			sb.WriteRune(v)
+		}
+	}
+
+	dp, err := strconv.Atoi(sb.String())
+	if err != nil {
+		r.logger.Error(err)
+		return 0, status.Error(codes.InvalidArgument, constants.ErrInvalidDiscount.Error())
+	}
+	if dp > 20 {
+		return 0, status.Error(codes.OutOfRange, constants.ErrDiscountOutRange.Error())
+	}
+
+	fd := 20 - dp
+
+	return int32(fd), nil
 }
 
 func (r *ReservationService) ViewTicket(ctx context.Context, id *protos.UserId) (*protos.Reservation, error) {

@@ -33,9 +33,10 @@ func NewReservationService(rs protos.ReservationServiceClient, log *logrus.Logge
 func (r *reservation) CreateTicket(ctx context.Context, user resources.User) (*resources.Reservation, error) {
 	r.logger.Info("enter Create ticket client")
 	protoUser := &protos.User{
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		EmailId:   user.EmailId,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		EmailId:      user.EmailId,
+		DiscountCode: user.DiscountCode,
 	}
 	res, err := r.reservationServer.CreateTicket(ctx, protoUser)
 	if err != nil {

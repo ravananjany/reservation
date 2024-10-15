@@ -9,11 +9,13 @@ message User{
        string first_name = 2;
        string last_name = 3;
        string email_id = 4;
+       string discount_code=5;
 }
 
 message BookingDetails{
         string section = 1;
-        int32 seat = 2; 
+        int32 seat = 2;
+        int32 discount_price = 3; 
 }
 
 message ReadAll{
